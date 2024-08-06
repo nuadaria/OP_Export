@@ -102,3 +102,6 @@ Recursively unescape HTML entities within JSON-like structures. It handles neste
     - Loads the mapping file based on the slug.
     - Standardizes the character data using the mapping.
 5. **Updates**: Stores the standardized data back in the character dictionary.
+
+External Mapping Workbook
+https://docs.google.com/spreadsheets/d/1OA5evJSW04avO2c0zJC9EJ5VCD08InljYfAh76jk6BQ/edit?gid=0#gid=0
