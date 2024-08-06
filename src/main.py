@@ -43,9 +43,33 @@ def load_mapping(file_path: str) -> Dict[str, str]:
     with open(file_path, 'r') as file:
         return json.load(file)
 
-def map_to_standard_format(data: Dict[str, Any], mapping: Dict[str, str]) -> Dict[str, Any]:
-    """Map data to a standardized format using the provided mapping."""
-    return {standard_key: (data.get(dynamic_key) if data.get(dynamic_key) is not None else '') for standard_key, dynamic_key in mapping.items()}
+def map_to_standard_format(data: Dict[str, Any], mapping: Dict[str, Any]) -> Dict[str, Any]:
+    """Map data to a standardized format using the provided mapping, handling nested and non-nested structures appropriately."""
+    def recursive_map(data: Any, mapping: Any) -> Any:
+        if isinstance(mapping, dict):
+            result = {}
+            for standard_key, dynamic_key in mapping.items():
+                if isinstance(dynamic_key, dict):
+                    # Handle nested dictionaries
+                    result[standard_key] = recursive_map(data.get(standard_key, {}), dynamic_key)
+                else:
+                    # Handle dot notation and nested values
+                    keys = dynamic_key.split('.')
+                    value = data
+                    for key in keys:
+                        if isinstance(value, dict):
+                            value = value.get(key, '')
+                        else:
+                            value = ''
+                            break
+                    result[standard_key] = value
+            return result
+        elif isinstance(data, list):
+            return [recursive_map(item, mapping) for item in data]
+        else:
+            return data if data is not None else ''
+    
+    return recursive_map(data, mapping)
 
 def extract_data_from_html(html: str, character_page: bool) -> Optional[Dict[str, str]]:
     """Extract data from HTML using a combined regular expression with named capturing groups."""
